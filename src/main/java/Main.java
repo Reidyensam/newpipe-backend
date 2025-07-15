@@ -1,6 +1,5 @@
 import static spark.Spark.*;
 import com.google.gson.Gson;
-import org.schabi.newpipe.extractor.NewPipe;
 import org.schabi.newpipe.extractor.ServiceList;
 import org.schabi.newpipe.extractor.stream.StreamInfo;
 import org.schabi.newpipe.extractor.stream.StreamSearchInfo;
@@ -12,16 +11,22 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        // 🟢 Log de arranque
-        System.out.println("🔊 Backend NewPipe iniciado…");
-
-        // Render asigna el puerto mediante variable de entorno
+        // 🟢 Puerto dinámico de Render
         int portNumber = Integer.parseInt(System.getenv("PORT"));
         port(portNumber);
 
+        // 📣 Log de arranque
+        System.out.println("✅ Backend iniciado en puerto: " + portNumber);
+
         Gson gson = new Gson();
 
-        // 🔍 Ruta de búsqueda: /search?q=belanova
+        // 🔍 Ruta simple raíz para testear
+        get("/", (req, res) -> {
+            res.type("text/plain");
+            return "🟢 Servicio NewPipe backend está activo!";
+        });
+
+        // 🔍 Búsqueda por palabra clave: /search?q=belanova
         get("/search", (req, res) -> {
             res.type("application/json");
             String query = req.queryParams("q");
@@ -42,12 +47,13 @@ public class Main {
 
                 return gson.toJson(Map.of("results", results));
             } catch (Exception e) {
+                System.out.println("❌ Error en /search: " + e.getMessage());
                 res.status(500);
-                return gson.toJson(Map.of("error", "Error al buscar: " + e.getMessage()));
+                return gson.toJson(Map.of("error", "Error al buscar contenido"));
             }
         });
 
-        // 🎥 Ruta de descarga: /video/:id
+        // 🎥 Ruta para extraer audio/video por ID: /video/:id
         get("/video/:id", (req, res) -> {
             res.type("application/json");
             String videoId = req.params("id");
@@ -67,8 +73,9 @@ public class Main {
 
                 return gson.toJson(response);
             } catch (Exception e) {
+                System.out.println("❌ Error en /video/:id: " + e.getMessage());
                 res.status(500);
-                return gson.toJson(Map.of("error", "Error al obtener video: " + e.getMessage()));
+                return gson.toJson(Map.of("error", "Error al obtener video"));
             }
         });
     }
