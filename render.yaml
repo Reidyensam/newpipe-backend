@@ -1,7 +1,6 @@
 services:
   - type: web
     name: newpipe-backend
-    env: custom
     plan: free
     repo: https://github.com/Reidyensam/newpipe-backend
     branch: master
