@@ -2,7 +2,6 @@ services:
   - type: web
     name: newpipe-backend
     plan: free
-    repo: https://github.com/Reidyensam/newpipe-backend
     branch: master
     buildCommand: |
       sudo apt-get update
