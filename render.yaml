@@ -1,7 +1,7 @@
 services:
   - type: web
     name: newpipe-backend
-    runtime: native
+    env: ubuntu
     buildCommand: |
       sudo apt-get update
       sudo apt-get install -y maven
