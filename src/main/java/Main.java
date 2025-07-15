@@ -12,50 +12,64 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        port(8080);
+        // 🟢 Log de arranque
+        System.out.println("🔊 Backend NewPipe iniciado…");
+
+        // Render asigna el puerto mediante variable de entorno
+        int portNumber = Integer.parseInt(System.getenv("PORT"));
+        port(portNumber);
+
         Gson gson = new Gson();
 
-        // 🔍 Búsqueda: /search?q=belanova
+        // 🔍 Ruta de búsqueda: /search?q=belanova
         get("/search", (req, res) -> {
             res.type("application/json");
             String query = req.queryParams("q");
 
-            StreamSearchInfo searchResult = StreamSearchInfo.getInfo(
-                ServiceList.Youtube, query);
+            try {
+                StreamSearchInfo searchResult = StreamSearchInfo.getInfo(ServiceList.Youtube, query);
+                List<Map<String, String>> results = new ArrayList<>();
 
-            List<Map<String, String>> results = new ArrayList<>();
-
-            for (StreamInfo item : searchResult.getRelatedStreams()) {
-                if (item.getStreamType() == StreamType.VIDEO) {
-                    Map<String, String> video = new HashMap<>();
-                    video.put("id", item.getUrl().split("v=")[1]);
-                    video.put("title", item.getName());
-                    video.put("thumbnail", item.getThumbnailUrl());
-                    results.add(video);
+                for (StreamInfo item : searchResult.getRelatedStreams()) {
+                    if (item.getStreamType() == StreamType.VIDEO) {
+                        Map<String, String> video = new HashMap<>();
+                        video.put("id", item.getUrl().split("v=")[1]);
+                        video.put("title", item.getName());
+                        video.put("thumbnail", item.getThumbnailUrl());
+                        results.add(video);
+                    }
                 }
-            }
 
-            return gson.toJson(Map.of("results", results));
+                return gson.toJson(Map.of("results", results));
+            } catch (Exception e) {
+                res.status(500);
+                return gson.toJson(Map.of("error", "Error al buscar: " + e.getMessage()));
+            }
         });
 
-        // 🎥 Obtener audio/video: /video/:id
+        // 🎥 Ruta de descarga: /video/:id
         get("/video/:id", (req, res) -> {
             res.type("application/json");
             String videoId = req.params("id");
 
-            StreamInfo info = StreamInfo.getInfo(ServiceList.Youtube,
-                    "https://www.youtube.com/watch?v=" + videoId);
+            try {
+                StreamInfo info = StreamInfo.getInfo(ServiceList.Youtube,
+                        "https://www.youtube.com/watch?v=" + videoId);
 
-            Optional<VideoStream> video = info.getVideoStreams().stream().findFirst();
-            Optional<AudioStream> audio = info.getAudioStreams().stream().findFirst();
+                Optional<VideoStream> video = info.getVideoStreams().stream().findFirst();
+                Optional<AudioStream> audio = info.getAudioStreams().stream().findFirst();
 
-            Map<String, String> response = new HashMap<>();
-            response.put("title", info.getName());
-            response.put("thumbnail", info.getThumbnailUrl());
-            response.put("videoUrl", video.map(VideoStream::getUrl).orElse(""));
-            response.put("audioUrl", audio.map(AudioStream::getUrl).orElse(""));
+                Map<String, String> response = new HashMap<>();
+                response.put("title", info.getName());
+                response.put("thumbnail", info.getThumbnailUrl());
+                response.put("videoUrl", video.map(VideoStream::getUrl).orElse(""));
+                response.put("audioUrl", audio.map(AudioStream::getUrl).orElse(""));
 
-            return gson.toJson(response);
+                return gson.toJson(response);
+            } catch (Exception e) {
+                res.status(500);
+                return gson.toJson(Map.of("error", "Error al obtener video: " + e.getMessage()));
+            }
         });
     }
 }
