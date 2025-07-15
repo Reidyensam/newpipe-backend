@@ -1,7 +1,6 @@
 services:
   - type: web
     name: newpipe-backend
-    runtime: docker
     plan: free
     branch: master
     buildCommand: |
