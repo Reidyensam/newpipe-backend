@@ -14,7 +14,7 @@ public class Main {
         String portEnv = System.getenv("PORT");
         int portNumber = (portEnv != null) ? Integer.parseInt(portEnv) : 10000;
         port(portNumber);
-        System.out.println("✅ Backend NewPipe iniciado en puerto: " + portNumber);
+        System.out.println("✅ Backend iniciado en puerto: " + portNumber);
 
         Gson gson = new Gson();
 
@@ -41,6 +41,7 @@ public class Main {
                         results.add(video);
                     }
                 }
+
                 return gson.toJson(Map.of("results", results));
             } catch (Exception e) {
                 System.out.println("❌ Error en /search: " + e.getMessage());
