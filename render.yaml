@@ -1,13 +1,9 @@
 services:
   - type: web
     name: newpipe-backend
+    runtime: docker
     plan: free
     branch: master
-    buildCommand: |
-      apt-get update
-      apt-get install -y maven
-      mvn package
-    startCommand: java -cp target/classes Main
     envVars:
       - key: PORT
         value: 10000
