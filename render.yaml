@@ -1,12 +1,12 @@
 services:
   - type: web
     name: newpipe-backend
-    env: custom
+    runtime: native
     buildCommand: |
       sudo apt-get update
       sudo apt-get install -y maven
-      mvn package exec:java -Dexec.mainClass=Main
-    startCommand: ""
+      mvn package
+    startCommand: java -cp target/classes Main
     repo: https://github.com/Reidyensam/newpipe-backend
     branch: master
     plan: free
