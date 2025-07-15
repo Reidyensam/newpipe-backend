@@ -4,8 +4,8 @@ services:
     plan: free
     branch: master
     buildCommand: |
-      sudo apt-get update
-      sudo apt-get install -y maven
+      apt-get update
+      apt-get install -y maven
       mvn package
     startCommand: java -cp target/classes Main
     envVars:
