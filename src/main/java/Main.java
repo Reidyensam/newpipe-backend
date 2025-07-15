@@ -11,25 +11,22 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        // 🟢 Puerto dinámico de Render
-        int portNumber = Integer.parseInt(System.getenv("PORT"));
+        String portEnv = System.getenv("PORT");
+        int portNumber = (portEnv != null) ? Integer.parseInt(portEnv) : 10000;
         port(portNumber);
-
-        // 📣 Log de arranque
-        System.out.println("✅ Backend iniciado en puerto: " + portNumber);
+        System.out.println("✅ Backend NewPipe iniciado en puerto: " + portNumber);
 
         Gson gson = new Gson();
 
-        // 🔍 Ruta simple raíz para testear
         get("/", (req, res) -> {
-            res.type("text/plain");
-            return "🟢 Servicio NewPipe backend está activo!";
+            res.type("application/json");
+            return gson.toJson(Map.of("info", "NewPipe backend activo 🎧"));
         });
 
-        // 🔍 Búsqueda por palabra clave: /search?q=belanova
         get("/search", (req, res) -> {
             res.type("application/json");
             String query = req.queryParams("q");
+            System.out.println("🔎 Buscando: " + query);
 
             try {
                 StreamSearchInfo searchResult = StreamSearchInfo.getInfo(ServiceList.Youtube, query);
@@ -44,7 +41,6 @@ public class Main {
                         results.add(video);
                     }
                 }
-
                 return gson.toJson(Map.of("results", results));
             } catch (Exception e) {
                 System.out.println("❌ Error en /search: " + e.getMessage());
@@ -53,10 +49,10 @@ public class Main {
             }
         });
 
-        // 🎥 Ruta para extraer audio/video por ID: /video/:id
         get("/video/:id", (req, res) -> {
             res.type("application/json");
             String videoId = req.params("id");
+            System.out.println("🎥 Accediendo a video ID: " + videoId);
 
             try {
                 StreamInfo info = StreamInfo.getInfo(ServiceList.Youtube,

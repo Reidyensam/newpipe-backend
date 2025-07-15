@@ -1,9 +1,7 @@
 services:
   - type: web
     name: newpipe-backend
-    runtime: docker
+    env: docker
+    region: oregon
     plan: free
-    branch: master
-    envVars:
-      - key: PORT
-        value: 10000
+    autoDeploy: true
