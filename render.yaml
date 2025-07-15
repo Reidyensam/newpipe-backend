@@ -1,12 +1,15 @@
 services:
   - type: web
     name: newpipe-backend
-    env: ubuntu
+    env: custom
+    plan: free
+    repo: https://github.com/Reidyensam/newpipe-backend
+    branch: master
     buildCommand: |
       sudo apt-get update
       sudo apt-get install -y maven
       mvn package
     startCommand: java -cp target/classes Main
-    repo: https://github.com/Reidyensam/newpipe-backend
-    branch: master
-    plan: free
+    envVars:
+      - key: PORT
+        value: 10000
